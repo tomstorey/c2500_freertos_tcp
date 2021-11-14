@@ -4,3 +4,4 @@
 [submodule "FreeRTOS-Plus-TCP"]
 	path = FreeRTOS-Plus-TCP
 	url = https://github.com/tomstorey/FreeRTOS-Plus-TCP.git
+    branch = c2500-lance
