@@ -16,6 +16,7 @@
         .extern _data_end
         .weak hardware_init_hook
         .weak software_init_hook
+        .weak JumpToZero
         .extern main
 
         .section .text
@@ -24,12 +25,19 @@
         .type _start, @function
         .globl _start
 _start:
+        move.l  #0, (0x03000000)        /* Clear debug display */
         move.w  #0x2700, %sr            /* Mask interrupts, supervisor mode */
 
-        movea.l #_stack_end, %sp        /* Manually configure the SP value,
+        movea.l #_stack_end, %sp        /* Manually configure the ISP value,
                                          * this allows the SP value in the ROM
                                          * image to be used e.g. to store a
                                          * checksum instead. */
+        clr.l   %d0                     /* Set MSP and USP to 0 */
+        movea.l %d0, %a0
+        move.l  %a0, %usp               /* USP first */
+        ori.w   #0x1000, %sr            /* A little dance for MSP */
+        move.l  %a0, %sp
+        andi.w  #0xEFFF, %sr
 
         /* --- Begin Cisco specific startup code --- */
         /* Startup delay */
@@ -51,6 +59,12 @@ _start:
         nop
         andi.w  #0xFFC0, (0x02110004)
         /* --- End Cisco specific startup code --- */
+
+        /* Setup caches */
+        /* move.w  #0x0808, %d0 */
+        /* movec   %d0, %cacr */
+        /* move.w  #0x2101, %d0 */
+        /* movec   %d0, %cacr */
 
 #if USEVBR
         /* If using a CPU with a VBR, point it to the beginning of ROM */
@@ -109,12 +123,17 @@ _start:
         movea.l %d0, %a0
         jsr     (%a0)
 
+7:      /* Install a "jump to zero" handler at address 0 */
+        move.w  #0x4EB9, (0)
+        move.l  #JumpToZero, (2)
+
         /* Jump to main() */
-7:      jmp     main
+        jmp     main
 
         /* In a bare metal environment, main() should not return as there is
          * nowhere to resume execution from. Behaviour is undefined if this
          * happens! */
+
 
 /*
  * __DefaultInterrupt handles all interrupt and exception vectors that have not
@@ -127,6 +146,7 @@ _start:
         .weak __DefaultInterrupt
         .globl __DefaultInterrupt
 __DefaultInterrupt:
+        move.l  #0x00FF00FF, (0x03000000)
         stop    #0x2700
         bra     .
 

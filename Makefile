@@ -13,7 +13,7 @@
 #
 # The compiler will automatically choose the correct source file (.c, .s etc)
 # according to the object file (.o) to be created.
-OBJ=main.o
+OBJ=main.o IRQ4.o exceptions_asm.o exceptions_c.o
 OBJ+= FreeRTOS-Kernel/portable/GCC/m68k/port.o FreeRTOS-Kernel/portable/GCC/m68k/portasm.o
 OBJ+= FreeRTOS-Kernel/tasks.o FreeRTOS-Kernel/queue.o FreeRTOS-Kernel/list.o
 OBJ+= FreeRTOS-Kernel/stream_buffer.o FreeRTOS-Kernel/event_groups.o
@@ -54,9 +54,8 @@ OBJDUMP=$(PREFIX)-objdump
 CFLAGS=-m$(CPU) -Wall -g -static -I../include -I./FreeRTOS-Kernel/include -I./FreeRTOS-Kernel/portable/GCC/m68k -I./FreeRTOS-Plus-TCP/include -I./FreeRTOS-Plus-TCP/portable/Compiler/GCC -I. -msoft-float -MMD -MP -O
 LFLAGS=--script=platform.ld -L../libmetal -lmetal
 
-SRC=$(wildcard *.c)
-DEP=$(SRC:%.c=%.d)
-INT=$(SRC:%.c=%.i)
+DEP=$(OBJ:%.o=%.d)
+INT=$(OBJ:%.o=%.i)
 
 %/%.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

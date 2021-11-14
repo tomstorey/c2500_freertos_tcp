@@ -1,10 +1,19 @@
 #ifndef FREERTOSCONFIG_H
 #define	FREERTOSCONFIG_H
 
+#ifndef __ASSEMBLER__
+
+#include "../include/assert.h"
+
+#define configASSERT assert
+#define configCHECK_FOR_STACK_OVERFLOW 2
+
+#endif /* __ASSEMBLER__ */
+
 #define configUSE_PREEMPTION 1
 #define configTICK_RATE_HZ ((TickType_t)100)
 #define configMAX_PRIORITIES 4
-#define configMINIMAL_STACK_SIZE 512
+#define configMINIMAL_STACK_SIZE 4096
 #define configMAX_TASK_NAME_LEN 32
 #define configUSE_16_BIT_TICKS 0
 #define configUSE_TASK_NOTIFICATIONS 1
@@ -34,7 +43,7 @@
 
 /* Interrupt nesting behaviour configuration. */
 #define configKERNEL_INTERRUPT_PRIORITY 0x4
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY 0x7
+#define configMAX_API_CALL_INTERRUPT_PRIORITY 0x5
 
 /* Optional functions */
 #define INCLUDE_vTaskDelay 1

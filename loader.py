@@ -6,7 +6,7 @@ from serial import Serial
 
 
 # Adjust this to point to your serial device
-DEV = '/dev/tty.usbserial-AI02GOMO'
+DEV = '/dev/tty.usbserial-A50285BI'
 
 
 def main():
@@ -89,7 +89,7 @@ def main():
 
     ser = Serial(
         DEV,
-        baudrate=57600,
+        baudrate=230400,
         timeout=1
     )
 
